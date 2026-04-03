@@ -19,19 +19,26 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.metermorphosis.ui.components.AppHeader
 import com.example.metermorphosis.ui.components.BottomNavigationText
 import com.example.metermorphosis.ui.components.InputContainer
 import com.example.metermorphosis.ui.theme.ColorOnSurface
 import com.example.metermorphosis.ui.theme.ColorPrimary
+import com.example.metermorphosis.viewmodel.AuthViewModel
 
 @Composable
 fun LoginScreen(
+    viewModel: AuthViewModel = viewModel(),
     onLoginSuccess: () -> Unit,
     onNavigateToRegister: () -> Unit
 ) {
-    var loginText by remember { mutableStateOf("") }
-    var passwordText by remember { mutableStateOf("") }
+    val loginText by viewModel.loginText.collectAsState()
+    val passwordText by viewModel.passwordText.collectAsState()
+
+    val loginError by viewModel.loginError.collectAsState()
+    val passwordError by viewModel.passwordError.collectAsState()
+
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally // Центрируем всё по горизонтали
