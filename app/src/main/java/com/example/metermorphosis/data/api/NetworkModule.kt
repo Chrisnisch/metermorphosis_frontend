@@ -16,4 +16,5 @@ object NetworkModule {
     val api: MeterApi by lazy {
         retrofit.create(MeterApi::class.java)
     }
+
 }

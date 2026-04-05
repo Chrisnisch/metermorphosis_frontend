@@ -20,7 +20,9 @@ fun InputContainer(
     onPasswordChange: (String) -> Unit,
     repeatPasswordValue: String = "",
     onRepeatPasswordChange: (String) -> Unit = {},
-    isRegistration: Boolean
+    isRegistration: Boolean,
+    loginError: String? = null,
+    passwordError: String? = null
 ) {
     // Карточка с закругленными углами 19 и цветом Primary Container
     Card(
@@ -34,7 +36,8 @@ fun InputContainer(
                 value = loginValue,
                 onValueChange = onLoginChange,
                 placeholder = "Логин",
-                isPassword = false
+                isPassword = false,
+                errorMessage = loginError
             )
 
             // Разделитель (тонкая линия)
@@ -45,7 +48,8 @@ fun InputContainer(
                 value = passwordValue,
                 onValueChange = onPasswordChange,
                 placeholder = "Пароль",
-                isPassword = true
+                isPassword = true,
+                errorMessage = passwordError
             )
 
             // Третье поле, если это регистрация

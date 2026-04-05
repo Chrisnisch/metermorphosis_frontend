@@ -66,7 +66,7 @@ fun MeterCard(meter: Meter) {
                 // Текстовый блок справа от фото
                 Column {
                     Text(
-                        text = meter.title.uppercase(), // БОЛЬШИМИ БУКВАМИ
+                        text = meter.name.uppercase(), // БОЛЬШИМИ БУКВАМИ
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White,
@@ -84,7 +84,7 @@ fun MeterCard(meter: Meter) {
                     Spacer(modifier = Modifier.height(5.dp))
 
                     Text(
-                        text = meter.description,
+                        text = meter.type,
                         fontSize = 12.sp,
                         color = ColorOutlineVariant, // Светлый текст описания
                     )
@@ -92,7 +92,7 @@ fun MeterCard(meter: Meter) {
                     Spacer(modifier = Modifier.height(5.dp))
 
                     Text(
-                        text = meter.lastUpdate,
+                        text = meter.lastReadingDate, // тут должно быть последнее обновление карточки, испаврим позже
                         fontSize = 12.sp,
                         color = Color(0xFFE5E5E5)
                     )

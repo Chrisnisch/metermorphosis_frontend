@@ -39,16 +39,24 @@ import com.example.metermorphosis.ui.theme.ColorPrimaryContainer
 import com.example.metermorphosis.ui.theme.ColorSecondary
 import com.example.metermorphosis.viewmodel.DashboardViewModel
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 // DashboardScreen.kt
 @Composable
 fun DashboardScreen(
-    viewModel: DashboardViewModel = androidx.lifecycle.viewmodel.compose.viewModel(), // Получаем ViewModel
-    onNavigateBack: () -> Unit
+    dashboardViewModel: DashboardViewModel = viewModel(), // Получаем ViewModel
+    token: String,
+    onNavigateToSettings: () -> Unit
 ) {
-    // Данные для примера
-    val meters by viewModel.meters.collectAsState()
+    val meters by dashboardViewModel.meters.collectAsState()
+    val isLoading by dashboardViewModel.isLoading.collectAsState()
+
+    LaunchedEffect(Unit) {
+        dashboardViewModel.loadMeters(token)
+    }
 
     // ИСПОЛЬЗУЕМ BOX, ЧТОБЫ НАКЛАДЫВАТЬ СЛОИ (МЕНЮ ПОВЕРХ КОНТЕНТА)
     Box(
@@ -111,17 +119,21 @@ fun DashboardScreen(
                 shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp), // Закругляем только верхние углы
                 color = ColorPrimaryContainer
             ) {
-                LazyColumn(
-                    contentPadding = PaddingValues(
-                        top = 10.dp,
-                        start = 10.dp,
-                        end = 10.dp,
-                        bottom = 100.dp // <-- ВАЖНО: Большой отступ снизу, чтобы меню не перекрывало последнюю карточку
-                    ),
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    items(meters) { meter ->
-                        MeterCard(meter)
+                if (isLoading && meters.isEmpty()) {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                } else {
+                    LazyColumn(
+                        contentPadding = PaddingValues(
+                            top = 10.dp,
+                            start = 10.dp,
+                            end = 10.dp,
+                            bottom = 100.dp // <-- ВАЖНО: Большой отступ снизу, чтобы меню не перекрывало последнюю карточку
+                        ),
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        items(meters) { meter ->
+                            MeterCard(meter)
+                        }
                     }
                 }
             }
@@ -155,7 +167,7 @@ fun DashboardScreen(
                     icon = Icons.Default.Settings,
                     label = "Настройки",
                     isSelected = false,
-                    onClick = { /* Навигация */ }
+                    onClick = { onNavigateToSettings() }
                 )
             }
         }
