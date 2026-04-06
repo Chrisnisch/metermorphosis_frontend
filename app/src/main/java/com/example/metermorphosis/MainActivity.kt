@@ -1,7 +1,6 @@
 package com.example.metermorphosis
 
 import android.os.Bundle
-import android.window.SplashScreen
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
@@ -18,7 +17,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.example.metermorphosis.data.api.TokenManager
 import com.example.metermorphosis.ui.screens.dashboard.DashboardScreen
-import com.example.metermorphosis.ui.screens.details.MeterDetailScreen
+import com.example.metermorphosis.ui.screens.meterDetails.MeterDetailScreen
 import com.example.metermorphosis.ui.screens.gallery.MeterGalleryScreen
 import com.example.metermorphosis.ui.screens.login.LoginScreen
 import com.example.metermorphosis.ui.screens.register.RegistrationScreen

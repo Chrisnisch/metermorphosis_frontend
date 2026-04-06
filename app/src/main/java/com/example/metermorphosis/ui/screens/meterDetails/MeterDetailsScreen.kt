@@ -1,4 +1,4 @@
-package com.example.metermorphosis.ui.screens.details
+package com.example.metermorphosis.ui.screens.meterDetails
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
