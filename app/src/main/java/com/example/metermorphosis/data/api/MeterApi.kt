@@ -18,4 +18,10 @@ interface MeterApi {
     suspend fun getMeters(
         @Header("Authorization") token: String
     ): Response<List<Meter>>
+
+    @POST("meters")
+    suspend fun createMeter(
+        @Header("Authorization") token: String,
+        @Body request: MeterRequest
+    ): Response<Meter>
 }

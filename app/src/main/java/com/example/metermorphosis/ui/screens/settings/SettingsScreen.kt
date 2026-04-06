@@ -1,15 +1,10 @@
 package com.example.metermorphosis.ui.screens.settings
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
@@ -22,7 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.metermorphosis.ui.components.CustomBottomMenuItem
-import com.example.metermorphosis.ui.components.MeterCard
+import com.example.metermorphosis.ui.components.SettingsItem
 import com.example.metermorphosis.ui.theme.ColorBackground
 import com.example.metermorphosis.ui.theme.ColorPrimary
 import com.example.metermorphosis.ui.theme.ColorPrimaryContainer
@@ -39,21 +34,21 @@ fun SettingsScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(ColorBackground) // Белый фон всего экрана
+            .background(ColorBackground)
     ) {
         // --- СЛОЙ 1: ВЕСЬ КОНТЕНТ (ЗАГОЛОВОК + СПИСОК) ---
         Column(
             modifier = Modifier
                 .fillMaxSize(),
-            verticalArrangement = Arrangement.Top // Прижимаем всё к верху!
+            verticalArrangement = Arrangement.Top
         ) {
             // Заголовок
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 24.dp), // Отступ сверху побольше (под статус бар)
+                    .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 24.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically // Выравнивание по вертикали по центру строки
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 // Текст слева
                 Column {
@@ -70,34 +65,21 @@ fun SettingsScreen(
                     )
                 }
 
-//                // Кнопка справа
-//                Button(
-//                    onClick = { /* Логика добавления */ },
-//                    shape = androidx.compose.foundation.shape.CircleShape,
-//                    colors = ButtonDefaults.buttonColors(containerColor = ColorPrimary),
-//                    contentPadding = PaddingValues(0.dp),
-//                    modifier = Modifier.size(50.dp)
-//                ) {
-//                    Icon(
-//                        imageVector = Icons.Default.Add,
-//                        contentDescription = "Добавить",
-//                        tint = Color.White
-//                    )
-//                }
             }
-
-            // Список настроек
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(19.dp),
-                colors = CardDefaults.cardColors(containerColor = ColorPrimaryContainer)
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 10.dp)
+                    .weight(1f),
+                shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp), // Закругляем только верхние углы
+                color = ColorPrimaryContainer
             ) {
                 Column {
                     // Пункт "Выход"
                     SettingsItem(
                         title = "Выйти из аккаунта",
-                        icon = Icons.Default.ExitToApp,
-                        textColor = Color.Red, // Выделим красным для важности
+                        icon = Icons.AutoMirrored.Filled.ExitToApp,
+                        textColor = Color.Red,
                         onClick = { onLogoutClick() }
                     )
                 }
@@ -108,20 +90,20 @@ fun SettingsScreen(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(16.dp)
-                .height(70.dp) // <-- Твоя желаемая высота (можно 65.dp, 60.dp)
+                .height(70.dp)
                 .shadow(
                     elevation = 12.dp,
                     shape = RoundedCornerShape(45.dp),
                     spotColor = Color.Black
                 ),
-            shape = RoundedCornerShape(45.dp), // Сильное скругление
-            color = ColorPrimaryContainer, // Цвет фона меню
+            shape = RoundedCornerShape(45.dp),
+            color = ColorPrimaryContainer,
         ) {
             // Используем Row вместо NavigationBar для полного контроля
             Row(
                 modifier = Modifier.fillMaxSize(),
-                horizontalArrangement = Arrangement.SpaceEvenly, // Равномерное распределение
-                verticalAlignment = Alignment.CenterVertically   // Идеальное центрирование по вертикали
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 // Кнопка 1: Дашборд (Активная)
                 CustomBottomMenuItem(
@@ -140,25 +122,5 @@ fun SettingsScreen(
                 )
             }
         }
-    }
-}
-
-@Composable
-fun SettingsItem(
-    title: String,
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    textColor: Color = ColorPrimary,
-    onClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(imageVector = icon, contentDescription = null, tint = textColor)
-        Spacer(modifier = Modifier.width(16.dp))
-        Text(text = title, color = textColor, fontSize = 16.sp)
     }
 }

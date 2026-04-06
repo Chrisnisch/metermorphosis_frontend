@@ -42,9 +42,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.metermorphosis.ui.components.AddMeterDialog
 
-// DashboardScreen.kt
 @Composable
 fun DashboardScreen(
     dashboardViewModel: DashboardViewModel = viewModel(), // Получаем ViewModel
@@ -53,6 +56,8 @@ fun DashboardScreen(
 ) {
     val meters by dashboardViewModel.meters.collectAsState()
     val isLoading by dashboardViewModel.isLoading.collectAsState()
+    var showAddDialog by remember { mutableStateOf(false) }
+
 
     LaunchedEffect(Unit) {
         dashboardViewModel.loadMeters(token)
@@ -95,7 +100,7 @@ fun DashboardScreen(
 
                 // Кнопка справа
                 Button(
-                    onClick = { /* Логика добавления */ },
+                    onClick = { showAddDialog = true },
                     shape = androidx.compose.foundation.shape.CircleShape,
                     colors = ButtonDefaults.buttonColors(containerColor = ColorPrimary),
                     contentPadding = PaddingValues(0.dp),
@@ -136,6 +141,15 @@ fun DashboardScreen(
                         }
                     }
                 }
+            }
+            if (showAddDialog) {
+                AddMeterDialog(
+                    onDismiss = { showAddDialog = false },
+                    onConfirm = { name ->
+                        dashboardViewModel.addMeter(token, name)
+                        showAddDialog = false
+                    }
+                )
             }
         }
         // --- СЛОЙ 2: ПАРЯЩЕЕ НИЖНЕЕ МЕНЮ (КАСТОМНОЕ) ---

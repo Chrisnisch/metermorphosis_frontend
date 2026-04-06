@@ -66,7 +66,7 @@ fun MeterCard(meter: Meter) {
                 // Текстовый блок справа от фото
                 Column {
                     Text(
-                        text = meter.name.uppercase(), // БОЛЬШИМИ БУКВАМИ
+                        text = meter.name.uppercase(),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White,
@@ -86,7 +86,7 @@ fun MeterCard(meter: Meter) {
                     Text(
                         text = meter.type,
                         fontSize = 12.sp,
-                        color = ColorOutlineVariant, // Светлый текст описания
+                        color = ColorOutlineVariant,
                     )
 
                     Spacer(modifier = Modifier.height(5.dp))
@@ -114,7 +114,7 @@ fun MeterCard(meter: Meter) {
                     onClick = { },
                     modifier = Modifier
                         .weight(1f)
-                        .height(48.dp), // Занимает половину ширины
+                        .height(48.dp),
                     shape = androidx.compose.ui.graphics.RectangleShape
                 ) {
                     Text("Добавить фото", color = Color.White, fontSize = 16.sp)
@@ -131,7 +131,7 @@ fun MeterCard(meter: Meter) {
                     onClick = { },
                     modifier = Modifier
                         .weight(1f)
-                        .height(48.dp), // Занимает половину ширины
+                        .height(48.dp),
                     shape = androidx.compose.ui.graphics.RectangleShape
                 ) {
                     Text("Подробнее", color = Color.White, fontSize = 16.sp)

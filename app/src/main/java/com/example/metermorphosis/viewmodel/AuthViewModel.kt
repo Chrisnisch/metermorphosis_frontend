@@ -144,10 +144,15 @@ class AuthViewModel(private val tokenManager: TokenManager) : ViewModel() {
                     _showRegisterSuccess.value = true
 
                     // 2. Ждем 2 секунды, чтобы юзер порадовался
-                    kotlinx.coroutines.delay(2000)
+                    kotlinx.coroutines.delay(1000)
 
                     // 3. Сохраняем токен и переходим на Dashboard автоматически
-                    _token.value = response.body()?.accessToken
+//                    _token.value = response.body()?.accessToken
+                    val newToken = response.body()?.accessToken
+                    if (newToken != null) {
+                        tokenManager.saveToken(newToken) // Сохраняем в память
+                        _token.value = newToken          // Обновляем StateFlow -> это триггер для входа!
+                    }
                 } else {
 //                    _registerError.value = "Ошибка сервера"
                     val errorBody = response.errorBody()?.string()

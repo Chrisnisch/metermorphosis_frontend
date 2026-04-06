@@ -36,6 +36,7 @@ import com.example.metermorphosis.viewmodel.AuthViewModel
 @Composable
 fun RegistrationScreen(
     viewModel: AuthViewModel = viewModel(),
+
     onNavigateToLogin: () -> Unit
 ) {
     val login by viewModel.registerLoginText.collectAsState()

@@ -77,9 +77,11 @@ fun MeterMorphosisApp() {
     }
 
     LaunchedEffect(token) {
-        if (token != null && currentScreen == "Login") {
+        if (token != null) {
             currentScreen = "Dashboard"
-        } else if (token == null && currentScreen == "Dashboard") {
+        } else if (currentScreen == "Dashboard") {
+            currentScreen = "Login"
+        } else if (currentScreen != "Splash" && currentScreen != "Register") {
             currentScreen = "Login"
         }
     }
