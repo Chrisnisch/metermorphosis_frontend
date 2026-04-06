@@ -25,11 +25,15 @@ class DashboardViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 // Отправляем запрос (по умолчанию тип COLD, можешь добавить выбор в диалоге)
-                val response = repository.createMeter(token, name, "COLD")
+                val response = repository.createMeter(token, name, "HOT_WATER")
 
                 if (response.isSuccessful) {
                     // Если успешно создали — сразу обновляем список на экране
-                    loadMeters(token)
+                    try {
+                        loadMeters(token)
+                    } catch (e: Exception) {
+                        android.util.Log.e("SOME_ERROR", "ОШИБКА: ${e.message}")
+                    }
                 } else {
                     // Обработка ошибки (например, имя уже занято)
                     val error = response.errorBody()?.string()

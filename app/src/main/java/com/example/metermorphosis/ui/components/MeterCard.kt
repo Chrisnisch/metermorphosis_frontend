@@ -92,7 +92,7 @@ fun MeterCard(meter: Meter) {
                     Spacer(modifier = Modifier.height(5.dp))
 
                     Text(
-                        text = meter.lastReadingDate, // тут должно быть последнее обновление карточки, испаврим позже
+                        text = meter.lastReadingDate ?: "new", // тут должно быть последнее обновление карточки, испаврим позже
                         fontSize = 12.sp,
                         color = Color(0xFFE5E5E5)
                     )

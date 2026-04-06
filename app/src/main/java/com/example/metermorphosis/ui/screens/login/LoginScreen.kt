@@ -34,7 +34,7 @@ fun LoginScreen(
     viewModel: AuthViewModel = viewModel(), // Используем нашу ViewModel
     onNavigateToRegister: () -> Unit
 ) {
-    // Подписываемся на данные из ViewModel (используем by для удобства)
+    // Подписываемся на данные из ViewModel
     val loginText by viewModel.loginText.collectAsState()
     val passwordText by viewModel.passwordText.collectAsState()
 

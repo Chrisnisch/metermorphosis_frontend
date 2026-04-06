@@ -5,7 +5,7 @@ data class Meter(
     val name: String,
     val type: String,
     val createdAt: String? = null,
-    val lastReadingDate: String
+    val lastReadingDate: String? = null
 )
 
 data class MeterRequest(
