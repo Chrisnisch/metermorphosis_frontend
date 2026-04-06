@@ -24,7 +24,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
@@ -45,13 +44,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.metermorphosis.ui.components.AddMeterDialog
 
 @Composable
 fun DashboardScreen(
-    dashboardViewModel: DashboardViewModel = viewModel(), // Получаем ViewModel
+    dashboardViewModel: DashboardViewModel = viewModel(),
     token: String,
+    onMeterClick: (Long, String) -> Unit,
     onNavigateToSettings: () -> Unit
 ) {
     val meters by dashboardViewModel.meters.collectAsState()
@@ -67,21 +68,21 @@ fun DashboardScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(ColorBackground) // Белый фон всего экрана
+            .background(ColorBackground)
     ) {
         // --- СЛОЙ 1: ВЕСЬ КОНТЕНТ (ЗАГОЛОВОК + СПИСОК) ---
         Column(
             modifier = Modifier
                 .fillMaxSize(),
-            verticalArrangement = Arrangement.Top // Прижимаем всё к верху!
+            verticalArrangement = Arrangement.Top
         ) {
             // 1. ЗАГОЛОВОК И КНОПКА "+"
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 24.dp), // Отступ сверху побольше (под статус бар)
+                    .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 24.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically // Выравнивание по вертикали по центру строки
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 // Текст слева
                 Column {
@@ -99,19 +100,19 @@ fun DashboardScreen(
                 }
 
                 // Кнопка справа
-                Button(
-                    onClick = { showAddDialog = true },
-                    shape = androidx.compose.foundation.shape.CircleShape,
-                    colors = ButtonDefaults.buttonColors(containerColor = ColorPrimary),
-                    contentPadding = PaddingValues(0.dp),
-                    modifier = Modifier.size(50.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = "Добавить",
-                        tint = Color.White
-                    )
-                }
+//                Button(
+//                    onClick = { showAddDialog = true },
+//                    shape = androidx.compose.foundation.shape.CircleShape,
+//                    colors = ButtonDefaults.buttonColors(containerColor = ColorPrimary),
+//                    contentPadding = PaddingValues(0.dp),
+//                    modifier = Modifier.size(50.dp)
+//                ) {
+//                    Icon(
+//                        imageVector = Icons.Default.Add,
+//                        contentDescription = "Добавить",
+//                        tint = Color.White
+//                    )
+//                }
             }
 
             // 2. КОНТЕЙНЕР С КАРТОЧКАМИ (ВТОРИЧНЫЙ ЦВЕТ)
@@ -120,8 +121,8 @@ fun DashboardScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 10.dp)
-                    .weight(1f), // <-- ВАЖНО: Растягивает контейнер до низа
-                shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp), // Закругляем только верхние углы
+                    .weight(1f),
+                shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp),
                 color = ColorPrimaryContainer
             ) {
                 if (isLoading && meters.isEmpty()) {
@@ -132,12 +133,31 @@ fun DashboardScreen(
                             top = 10.dp,
                             start = 10.dp,
                             end = 10.dp,
-                            bottom = 100.dp // <-- ВАЖНО: Большой отступ снизу, чтобы меню не перекрывало последнюю карточку
+                            bottom = 100.dp
                         ),
-                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                        verticalArrangement = Arrangement.spacedBy(10.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         items(meters) { meter ->
-                            MeterCard(meter)
+                            MeterCard(
+                                meter = meter,
+                                onClick = { onMeterClick(meter.id, meter.name) }
+                            )
+                        }
+                        item {
+                            Button(
+                                onClick = { showAddDialog = true },
+                                shape = androidx.compose.foundation.shape.CircleShape,
+                                colors = ButtonDefaults.buttonColors(containerColor = ColorPrimary),
+                                contentPadding = PaddingValues(0.dp),
+                                modifier = Modifier.size(50.dp),
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Add,
+                                    contentDescription = "Добавить",
+                                    tint = Color.White
+                                )
+                        }
                         }
                     }
                 }
@@ -157,16 +177,15 @@ fun DashboardScreen(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(16.dp)
-                .height(70.dp) // <-- Твоя желаемая высота (можно 65.dp, 60.dp)
+                .height(70.dp)
                 .shadow(elevation = 12.dp, shape = RoundedCornerShape(45.dp), spotColor = Color.Black),
-            shape = RoundedCornerShape(45.dp), // Сильное скругление
-            color = ColorPrimaryContainer, // Цвет фона меню
+            shape = RoundedCornerShape(45.dp),
+            color = ColorPrimaryContainer,
         ) {
-            // Используем Row вместо NavigationBar для полного контроля
             Row(
                 modifier = Modifier.fillMaxSize(),
-                horizontalArrangement = Arrangement.SpaceEvenly, // Равномерное распределение
-                verticalAlignment = Alignment.CenterVertically   // Идеальное центрирование по вертикали
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 // Кнопка 1: Дашборд (Активная)
                 CustomBottomMenuItem(

@@ -5,7 +5,9 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.PATCH
 import retrofit2.http.POST
+import retrofit2.http.Path
 
 interface MeterApi {
     @POST("auth/login")
@@ -22,6 +24,13 @@ interface MeterApi {
     @POST("meters")
     suspend fun createMeter(
         @Header("Authorization") token: String,
+        @Body request: MeterRequest
+    ): Response<Meter>
+
+    @PATCH("meters/{id}")
+    suspend fun updateMeter(
+        @Header("Authorization") token: String,
+        @Path("id") meterId: Long,
         @Body request: MeterRequest
     ): Response<Meter>
 }

@@ -18,6 +18,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.example.metermorphosis.data.api.TokenManager
 import com.example.metermorphosis.ui.screens.dashboard.DashboardScreen
+import com.example.metermorphosis.ui.screens.details.MeterDetailScreen
+import com.example.metermorphosis.ui.screens.gallery.MeterGalleryScreen
 import com.example.metermorphosis.ui.screens.login.LoginScreen
 import com.example.metermorphosis.ui.screens.register.RegistrationScreen
 import com.example.metermorphosis.ui.screens.settings.SettingsScreen
@@ -50,6 +52,8 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MeterMorphosisApp() {
     val context = androidx.compose.ui.platform.LocalContext.current
+    var currentMeterId by remember { mutableStateOf<Long?>(null) }
+    var currentMeterName by remember { mutableStateOf("") }
 
     // Создаем ViewModel с параметром (через Factory)
     val authViewModel: AuthViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
@@ -99,7 +103,12 @@ fun MeterMorphosisApp() {
         )
         "Dashboard" -> DashboardScreen(
             token = token ?: "",
-            onNavigateToSettings = { currentScreen = "Settings" }, // Переход на настройки
+            onNavigateToSettings = { currentScreen = "Settings" },
+            onMeterClick = { id, name ->
+                currentMeterId = id
+                currentMeterName = name
+                currentScreen = "MeterDetails"
+            }
         )
         "Settings" -> SettingsScreen(
             onNavigateToDashboard = { currentScreen = "Dashboard" }, // Назад по кнопке меню
@@ -107,6 +116,19 @@ fun MeterMorphosisApp() {
                 authViewModel.logout()
                 currentScreen = "Login"
             }
+        )
+        "MeterDetails" -> MeterDetailScreen(
+            token = token ?: "",
+            meterId = currentMeterId ?: 0L,
+            meterName = currentMeterName,
+            onBackClick = { currentScreen = "Dashboard" },
+            onNavigateToGallery = { currentScreen = "MeterGallery" }
+        )
+        "MeterGallery" -> MeterGalleryScreen(
+            meterId = currentMeterId ?: 0L,
+            meterName = currentMeterName,
+            onBackClick = { currentScreen = "Dashboard" },
+            onNavigateToStat = { currentScreen = "MeterDetails" }
         )
     }
 }

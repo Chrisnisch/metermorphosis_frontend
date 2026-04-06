@@ -1,5 +1,6 @@
 package com.example.metermorphosis.ui.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -33,12 +34,18 @@ import com.example.metermorphosis.ui.theme.ColorOutlineVariant
 import com.example.metermorphosis.ui.theme.ColorPrimary
 
 @Composable
-fun MeterCard(meter: Meter) {
+fun MeterCard(
+    meter: Meter,
+    onClick: () -> Unit
+
+) {
     Card(
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = ColorPrimary), // Основной цвет карточки
-        modifier = Modifier.fillMaxWidth()
-    ) {
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() }
+     ) {
         Column {
             // Верхняя часть: Миниатюра + Текст
             Row(
@@ -101,42 +108,42 @@ fun MeterCard(meter: Meter) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            HorizontalDivider(color = Color.White, thickness = 1.dp)
+//            HorizontalDivider(color = Color.White, thickness = 1.dp)
 
             // Нижняя часть: Кнопки с обводкой
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(IntrinsicSize.Min)
-            ) {
-                // Кнопка "Добавить фото"
-                TextButton(
-                    onClick = { },
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(48.dp),
-                    shape = androidx.compose.ui.graphics.RectangleShape
-                ) {
-                    Text("Добавить фото", color = Color.White, fontSize = 16.sp)
-                }
-
-                VerticalDivider(
-                    color = Color.White,
-                    thickness = 1.dp,
-                    modifier = Modifier.fillMaxHeight().width(1.dp)
-                )
-
-                // Кнопка "Детали"
-                TextButton(
-                    onClick = { },
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(48.dp),
-                    shape = androidx.compose.ui.graphics.RectangleShape
-                ) {
-                    Text("Подробнее", color = Color.White, fontSize = 16.sp)
-                }
-            }
+//            Row(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .height(IntrinsicSize.Min)
+//            ) {
+//                // Кнопка "Добавить фото"
+//                TextButton(
+//                    onClick = { },
+//                    modifier = Modifier
+//                        .weight(1f)
+//                        .height(48.dp),
+//                    shape = androidx.compose.ui.graphics.RectangleShape
+//                ) {
+//                    Text("Добавить фото", color = Color.White, fontSize = 16.sp)
+//                }
+//
+//                VerticalDivider(
+//                    color = Color.White,
+//                    thickness = 1.dp,
+//                    modifier = Modifier.fillMaxHeight().width(1.dp)
+//                )
+//
+//                // Кнопка "Детали"
+//                TextButton(
+//                    onClick = { },
+//                    modifier = Modifier
+//                        .weight(1f)
+//                        .height(48.dp),
+//                    shape = androidx.compose.ui.graphics.RectangleShape
+//                ) {
+//                    Text("Подробнее", color = Color.White, fontSize = 16.sp)
+//                }
+//            }
         }
     }
 }

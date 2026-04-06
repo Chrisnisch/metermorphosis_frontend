@@ -2,9 +2,7 @@ package com.example.metermorphosis.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.metermorphosis.data.api.NetworkModule
 import com.example.metermorphosis.data.model.Meter
-import com.example.metermorphosis.data.model.MeterRequest
 import com.example.metermorphosis.data.repository.MeterRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

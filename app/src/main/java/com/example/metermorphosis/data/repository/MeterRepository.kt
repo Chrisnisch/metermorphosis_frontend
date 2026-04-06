@@ -15,4 +15,9 @@ class MeterRepository {
         val request = MeterRequest(name = name, type = type)
         return NetworkModule.api.createMeter("Bearer $token", request)
     }
+
+    suspend fun updateMeter(token: String, id: Long, name: String, type: String): Response<Meter> {
+        val request = MeterRequest(name = name, type = type)
+        return NetworkModule.api.updateMeter("Bearer $token", id, request)
+    }
 }
