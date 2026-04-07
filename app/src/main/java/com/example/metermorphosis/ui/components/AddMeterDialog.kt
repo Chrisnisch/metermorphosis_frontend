@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.metermorphosis.ui.theme.ColorPrimary
 
 @Composable
 fun AddMeterDialog(
@@ -22,7 +23,7 @@ fun AddMeterDialog(
             Text(
                 text = "Новый счетчик",
                 style = MaterialTheme.typography.headlineSmall,
-                color = Color(0xFF1D1B20) // Твой ColorPrimary
+                color = ColorPrimary
             )
         },
         text = {
@@ -42,8 +43,8 @@ fun AddMeterDialog(
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color(0xFF6750A4), // Твой ColorPrimary
-                        cursorColor = Color(0xFF6750A4)
+                        focusedBorderColor = ColorPrimary,
+                        cursorColor = ColorPrimary
                     )
                 )
 
@@ -58,14 +59,14 @@ fun AddMeterDialog(
                         onConfirm(meterName)
                     }
                 },
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6750A4))
+                colors = ButtonDefaults.buttonColors(containerColor = ColorPrimary)
             ) {
                 Text("Добавить", color = Color.White)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Отмена", color = Color(0xFF6750A4))
+                Text("Отмена", color = ColorPrimary)
             }
         }
     )

@@ -1,7 +1,6 @@
 package com.example.metermorphosis.ui.screens.splash
 
 import androidx.compose.animation.*
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -10,9 +9,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.example.metermorphosis.R // Твой пакет
 import com.example.metermorphosis.ui.theme.ColorPrimary
 import com.example.metermorphosis.ui.theme.ColorPrimaryContainer
 
