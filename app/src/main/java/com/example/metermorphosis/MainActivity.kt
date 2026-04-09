@@ -90,8 +90,9 @@ fun MeterMorphosisApp() {
     }
 
     when (currentScreen) {
-        "Splash" -> SplashScreen()
+        "Splash" -> SplashScreen(
 
+        )
         "Login" -> LoginScreen(
             viewModel = authViewModel,
             onNavigateToRegister = {currentScreen = "Register"}

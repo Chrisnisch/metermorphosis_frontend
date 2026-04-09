@@ -6,5 +6,6 @@
         <!-- Если будешь тестировать на реальном телефоне через WiFi,
              можно разрешить всё (только на время разработки!) -->
         <domain includeSubdomains="true">localhost</domain>
+        <domain includeSubdomains="true">172.20.10.5</domain>
     </domain-config>
 </network-security-config>
