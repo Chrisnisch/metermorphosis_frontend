@@ -1,5 +1,7 @@
 package com.example.metermorphosis.ui.screens.dashboard
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -48,17 +50,26 @@ import androidx.compose.ui.Alignment
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.metermorphosis.ui.components.AddMeterDialog
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DashboardScreen(
     dashboardViewModel: DashboardViewModel = viewModel(),
     token: String,
-    onMeterClick: (Long, String) -> Unit,
+    onMeterClick: (Long, String, Boolean) -> Unit,
     onNavigateToSettings: () -> Unit
 ) {
     val meters by dashboardViewModel.meters.collectAsState()
     val isLoading by dashboardViewModel.isLoading.collectAsState()
+    val createdMeter by dashboardViewModel.createdMeter.collectAsState()
+
     var showAddDialog by remember { mutableStateOf(false) }
 
+    LaunchedEffect(createdMeter) {
+        createdMeter?.let { meter ->
+            onMeterClick(meter.id, meter.name, true)
+            dashboardViewModel.clearCreatedMeter()
+        }
+    }
 
     LaunchedEffect(Unit) {
         dashboardViewModel.loadMeters(token)
@@ -141,7 +152,7 @@ fun DashboardScreen(
                         items(meters) { meter ->
                             MeterCard(
                                 meter = meter,
-                                onClick = { onMeterClick(meter.id, meter.name) }
+                                onClick = { onMeterClick(meter.id, meter.name, false) }
                             )
                         }
                         item {

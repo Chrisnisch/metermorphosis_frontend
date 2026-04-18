@@ -2,7 +2,7 @@ package com.example.metermorphosis.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.metermorphosis.data.model.Meter
+import com.example.metermorphosis.data.model.MeterResponse
 import com.example.metermorphosis.data.repository.MeterRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -12,12 +12,15 @@ class DashboardViewModel : ViewModel() {
     private val repository = MeterRepository()
 
     // Состояние списка счетчиков
-    private val _meters = MutableStateFlow<List<Meter>>(emptyList())
+    private val _meters = MutableStateFlow<List<MeterResponse>>(emptyList())
     val meters = _meters.asStateFlow()
 
     // Состояние загрузки (чтобы показать индикатор)
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
+
+    private val _createdMeter = MutableStateFlow<MeterResponse?>(null)
+    val createdMeter = _createdMeter.asStateFlow()
 
     fun addMeter(token: String, name: String) {
         viewModelScope.launch {
@@ -28,7 +31,9 @@ class DashboardViewModel : ViewModel() {
                 if (response.isSuccessful) {
                     // Если успешно создали — сразу обновляем список на экране
                     try {
+                        val newMeter = response.body()
                         loadMeters(token)
+                        _createdMeter.value = newMeter
                     } catch (e: Exception) {
                         android.util.Log.e("SOME_ERROR", "ОШИБКА: ${e.message}")
                     }
@@ -41,6 +46,10 @@ class DashboardViewModel : ViewModel() {
                 android.util.Log.e("API_ERROR", "Ошибка сети: ${e.message}")
             }
         }
+    }
+
+    fun clearCreatedMeter() {
+        _createdMeter.value = null
     }
 
     fun loadMeters(token: String) {

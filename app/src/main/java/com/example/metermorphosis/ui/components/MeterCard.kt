@@ -1,5 +1,7 @@
 package com.example.metermorphosis.ui.components
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -29,13 +31,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.metermorphosis.data.model.Meter
+import com.example.metermorphosis.data.model.MeterResponse
 import com.example.metermorphosis.ui.theme.ColorOutlineVariant
 import com.example.metermorphosis.ui.theme.ColorPrimary
+import com.example.metermorphosis.ui.theme.dateFormatter
+import java.time.LocalDate
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MeterCard(
-    meter: Meter,
+    meter: MeterResponse,
     onClick: () -> Unit
 
 ) {
@@ -91,7 +96,7 @@ fun MeterCard(
                     Spacer(modifier = Modifier.height(5.dp))
 
                     Text(
-                        text = meter.type,
+                        text = "Кстати, вы прекрасны!", // meter.type,
                         fontSize = 12.sp,
                         color = ColorOutlineVariant,
                     )
@@ -99,7 +104,7 @@ fun MeterCard(
                     Spacer(modifier = Modifier.height(5.dp))
 
                     Text(
-                        text = meter.lastReadingDate ?: "new", // тут должно быть последнее обновление карточки, испаврим позже
+                        text = LocalDate.now().format(dateFormatter).toString(), // meter.lastReadingDate ?: "new", // тут должно быть последнее обновление карточки, испаврим позже
                         fontSize = 12.sp,
                         color = Color(0xFFE5E5E5)
                     )
