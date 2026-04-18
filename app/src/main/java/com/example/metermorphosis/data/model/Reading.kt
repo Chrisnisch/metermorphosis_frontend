@@ -14,3 +14,7 @@ data class Reading(
     val photoUrl: String?,
     val createdAt: String?
 )
+
+data class UpdateReadingRequest(
+    val value: Int
+)

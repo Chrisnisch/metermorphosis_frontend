@@ -57,6 +57,13 @@ interface MeterApi {
         @Path("id") id: Long
     ): Response<Unit>
 
+    @PATCH("readings/{id}")
+    suspend fun updateReading(
+        @Header("Authorization") token: String,
+        @Path("id") id: Long,
+        @Body request: UpdateReadingRequest
+    ): Response<Reading>
+
     // === RECOGNIZE ===
     @Multipart
     @POST("recognize")

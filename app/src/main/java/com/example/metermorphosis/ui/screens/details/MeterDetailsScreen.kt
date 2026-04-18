@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -17,6 +18,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.metermorphosis.ui.components.AddPhotoDialog
 import com.example.metermorphosis.ui.components.CustomBottomMenuItem
+import com.example.metermorphosis.ui.components.ReadingsChart
+import com.example.metermorphosis.ui.components.StatCard
 import com.example.metermorphosis.ui.theme.*
 import com.example.metermorphosis.viewmodel.DetailsViewModel
 
@@ -33,12 +36,21 @@ fun MeterDetailScreen(
 ) {
     var showEditDialog by remember { mutableStateOf(false) }
     var showPhotoDialog by remember { mutableStateOf(false) }
+    val stats by detailsViewModel.stats.collectAsState()
+    val chartData by detailsViewModel.chartData.collectAsState()
+    val chartPeriod by detailsViewModel.chartPeriod.collectAsState()
 
     LaunchedEffect(isNewMeter) {
         if (isNewMeter) {
             showPhotoDialog = true
             onNewMeterHandled()
         }
+    }
+
+    // Загружаем данные
+    LaunchedEffect(meterId) {
+        detailsViewModel.loadStats(token, meterId)
+        detailsViewModel.loadChart(token, meterId)
     }
 
     Box(
@@ -77,7 +89,7 @@ fun MeterDetailScreen(
                 }
             }
 
-            // 2. ОСНОВНОЙ КОНТЕНТ (Белая подложка как на Дашборде)
+            // 2. ОСНОВНОЙ КОНТЕНТ
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -86,7 +98,37 @@ fun MeterDetailScreen(
                 shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp),
                 color = ColorPrimaryContainer
             ) {
-                // TODO
+                // 2. ПЛАШКИ СТАТИСТИКИ
+                Text(
+                    text = "Потребление",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = ColorPrimary
+                )
+
+                Spacer(Modifier.height(8.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    StatCard(
+                        title = "За месяц",
+                        value = stats?.monthConsumption?.toString() ?: "—",
+                        unit = "м³",
+                        icon = Icons.Default.Water,
+                        modifier = Modifier.weight(1f)
+                    )
+                    StatCard(
+                        title = "Среднее",
+                        value = stats?.averageMonthConsumption?.toString() ?: "—",
+                        unit = "м³/мес",
+                        icon = Icons.AutoMirrored.Filled.TrendingUp,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+
+                Spacer(Modifier.height(20.dp))
             }
         }
         // 3. ПАРЯЩЕЕ МЕНЮ
@@ -128,7 +170,6 @@ fun MeterDetailScreen(
                 onPickFromGallery = {
                     showPhotoDialog = false
                     onNavigateToGallery() // Переключаем на вкладку Галерея
-                    // TODO: Запуск выбора фото (сделаем в следующем шаге)
                 },
                 onTakePhoto = {
                     showPhotoDialog = false

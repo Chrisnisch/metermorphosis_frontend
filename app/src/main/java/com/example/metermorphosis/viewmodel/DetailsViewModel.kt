@@ -1,14 +1,19 @@
 package com.example.metermorphosis.viewmodel
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.metermorphosis.data.api.NetworkModule
+import com.example.metermorphosis.data.model.ChartPoint
 import com.example.metermorphosis.data.model.MeterResponse
 import com.example.metermorphosis.data.model.ReadingResponse
+import com.example.metermorphosis.data.model.StatsResponse
 import com.example.metermorphosis.data.model.UpdateMeterRequest
+import com.example.metermorphosis.data.model.UpdateReadingRequest
 import com.example.metermorphosis.data.repository.MeterRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -35,8 +40,71 @@ class DetailsViewModel: ViewModel() {
     private val _error = MutableStateFlow<String?>(null)
     val error = _error.asStateFlow()
 
+    private val _photos = MutableStateFlow<Map<String, Bitmap?>>(emptyMap())
+    val photos = _photos.asStateFlow()
 
-    // 1. Загрузка истории показаний
+    private val _stats = MutableStateFlow<StatsResponse?>(null)
+    val stats = _stats.asStateFlow()
+
+    private val _chartData = MutableStateFlow<List<ChartPoint>>(emptyList())
+    val chartData = _chartData.asStateFlow()
+
+    private val _chartPeriod = MutableStateFlow("MONTH")
+    val chartPeriod = _chartPeriod.asStateFlow()
+
+    fun loadStats(token: String, meterId: Long) {
+        viewModelScope.launch {
+            try {
+                val response = NetworkModule.api.getStats("Bearer $token", meterId)
+                if (response.isSuccessful) {
+                    _stats.value = response.body()
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("STATS", "Ошибка: ${e.message}")
+            }
+        }
+    }
+
+    fun loadChart(token: String, meterId: Long, period: String = "MONTH") {
+        _chartPeriod.value = period
+        viewModelScope.launch {
+            try {
+                val response = NetworkModule.api.getReadingChart("Bearer $token", meterId, period)
+                if (response.isSuccessful) {
+                    _chartData.value = response.body()?.points ?: emptyList()
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("CHART", "Ошибка: ${e.message}")
+            }
+        }
+    }
+
+    fun loadPhoto(token: String, photoUrl: String) {
+        val filename = photoUrl.substringAfterLast("/")
+
+        if (_photos.value.containsKey(filename)) return
+
+        viewModelScope.launch {
+            try {
+                val response = NetworkModule.api.getFile("Bearer $token", filename)
+                if (response.isSuccessful) {
+                    val bytes = response.body()?.bytes()
+                    val bitmap = bytes?.let {
+                        BitmapFactory.decodeByteArray(it, 0, it.size)
+                    }
+                    // bitmap может быть null если файл не картинка
+                    _photos.value = _photos.value + (filename to bitmap)
+                } else {
+                    // Файл не найден (404) — запоминаем null, чтобы не грузить повторно
+                    _photos.value = _photos.value + (filename to null)
+                }
+            } catch (e: Exception) {
+                _photos.value = _photos.value + (filename to null)
+            }
+        }
+    }
+
+    // Загрузка истории показаний
     fun loadReadings(token: String, meterId: Long) {
         viewModelScope.launch {
             _isLoading.value = true
@@ -58,7 +126,7 @@ class DetailsViewModel: ViewModel() {
         }
     }
 
-    // 2. Распознавание значения с фото
+    //  Распознавание значения с фото
     fun recognizeFromPhoto(token: String, context: Context, uri: Uri) {
         viewModelScope.launch {
             _isLoading.value = true
@@ -78,7 +146,7 @@ class DetailsViewModel: ViewModel() {
         }
     }
 
-    // 3. Создание показания с фото
+    // Создание показания с фото
     fun createReading(token: String, meterId: Long, value: Int, context: Context, photoUri: Uri, onSuccess: () -> Unit) {
         viewModelScope.launch {
             _isLoading.value = true
@@ -103,7 +171,7 @@ class DetailsViewModel: ViewModel() {
         }
     }
 
-    // 4. Удаление показания
+    // Удаление показания
     fun deleteReading(token: String, readingId: Long, meterId: Long) {
         viewModelScope.launch {
             try {
@@ -146,6 +214,24 @@ class DetailsViewModel: ViewModel() {
                 }
             } catch (e: Exception) {
                 android.util.Log.e("METERS_DEBUG", "Критическая ошибка: ${e.message}")
+            }
+        }
+    }
+
+    fun updateReading(token: String, readingId: Long, newValue: Int, meterId: Long) {
+        viewModelScope.launch {
+            try {
+                val request = UpdateReadingRequest(value = newValue)
+                val response = NetworkModule.api.updateReading(
+                    "Bearer $token", readingId, request
+                )
+                if (response.isSuccessful) {
+                    loadReadings(token, meterId)
+                } else {
+                    _error.value = "Ошибка обновления: ${response.errorBody()?.string()}"
+                }
+            } catch (e: Exception) {
+                _error.value = "Ошибка сети: ${e.message}"
             }
         }
     }

@@ -152,7 +152,8 @@ fun DashboardScreen(
                         items(meters) { meter ->
                             MeterCard(
                                 meter = meter,
-                                onClick = { onMeterClick(meter.id, meter.name, false) }
+                                onClick = { onMeterClick(meter.id, meter.name, false) },
+                                token = token
                             )
                         }
                         item {
