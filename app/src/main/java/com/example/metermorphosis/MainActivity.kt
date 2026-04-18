@@ -1,8 +1,10 @@
 package com.example.metermorphosis
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -17,7 +19,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.example.metermorphosis.data.api.TokenManager
 import com.example.metermorphosis.ui.screens.dashboard.DashboardScreen
-import com.example.metermorphosis.ui.screens.meterDetails.MeterDetailScreen
+import com.example.metermorphosis.ui.screens.details.MeterDetailScreen
 import com.example.metermorphosis.ui.screens.gallery.MeterGalleryScreen
 import com.example.metermorphosis.ui.screens.login.LoginScreen
 import com.example.metermorphosis.ui.screens.register.RegistrationScreen
@@ -27,6 +29,7 @@ import com.example.metermorphosis.ui.theme.ColorBackground
 import com.example.metermorphosis.viewmodel.AuthViewModel
 
 class MainActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -48,11 +51,13 @@ class MainActivity : ComponentActivity() {
 }
 
 // --- 2. ЛОГИКА ПЕРЕКЛЮЧЕНИЯ ЭКРАНОВ ---
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MeterMorphosisApp() {
     val context = androidx.compose.ui.platform.LocalContext.current
     var currentMeterId by remember { mutableStateOf<Long?>(null) }
     var currentMeterName by remember { mutableStateOf("") }
+    var isNewMeter by remember { mutableStateOf(false) }
 
     // Создаем ViewModel с параметром (через Factory)
     val authViewModel: AuthViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
@@ -103,9 +108,10 @@ fun MeterMorphosisApp() {
         "Dashboard" -> DashboardScreen(
             token = token ?: "",
             onNavigateToSettings = { currentScreen = "Settings" },
-            onMeterClick = { id, name ->
+            onMeterClick = { id, name, isNew ->
                 currentMeterId = id
                 currentMeterName = name
+                isNewMeter = isNew
                 currentScreen = "MeterDetails"
             }
         )
@@ -120,14 +126,20 @@ fun MeterMorphosisApp() {
             token = token ?: "",
             meterId = currentMeterId ?: 0L,
             meterName = currentMeterName,
-            onBackClick = { currentScreen = "Dashboard" },
+            isNewMeter = isNewMeter,
+            onNewMeterHandled = { isNewMeter = false },
+            onBackClick = {
+                isNewMeter = false
+                currentScreen = "Dashboard"
+            },
             onNavigateToGallery = { currentScreen = "MeterGallery" }
         )
         "MeterGallery" -> MeterGalleryScreen(
+            token = token ?: "",
             meterId = currentMeterId ?: 0L,
             meterName = currentMeterName,
             onBackClick = { currentScreen = "Dashboard" },
-            onNavigateToStat = { currentScreen = "MeterDetails" }
+            onNavigateToStatistics = { currentScreen = "MeterDetails" }
         )
     }
 }
