@@ -98,7 +98,7 @@ fun DashboardScreen(
                 // Текст слева
                 Column {
                     Text(
-                        text = "Дашборд",
+                        text = "Главная",
                         fontSize = 32.sp,
                         fontWeight = FontWeight.Bold,
                         color = ColorPrimary
@@ -202,7 +202,7 @@ fun DashboardScreen(
                 // Кнопка 1: Дашборд (Активная)
                 CustomBottomMenuItem(
                     icon = Icons.Default.Home,
-                    label = "Дашборд",
+                    label = "Главная",
                     isSelected = true,
                     onClick = { /* Навигация */ }
                 )

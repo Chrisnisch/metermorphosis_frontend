@@ -244,18 +244,20 @@ class DetailsViewModel: ViewModel() {
         }
     }
 
-    fun updateReading(token: String, readingId: Long, newValue: Int, meterId: Long) {
+    fun updateReading(token: String, readingId: Long, newValue: Int, newDate: String?, meterId: Long) {
         viewModelScope.launch {
             try {
                 val response = NetworkModule.api.updateReading(
                     token = "Bearer $token",
                     id = readingId,
-                    value = newValue
+                    value = newValue,
+                    date = newDate
                 )
                 if (response.isSuccessful) {
                     loadReadings(token, meterId)
                 } else {
                     _error.value = "Ошибка: ${response.errorBody()?.string()}"
+                    android.util.Log.e("UPDATE_DEBUG", "WTF: ${_error.value}")
                 }
             } catch (e: Exception) {
                 _error.value = "Ошибка сети: ${e.message}"

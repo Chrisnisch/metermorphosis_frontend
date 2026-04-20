@@ -179,43 +179,6 @@ fun MeterCard(
             }
 
             Spacer(modifier = Modifier.height(8.dp))
-
-//            HorizontalDivider(color = Color.White, thickness = 1.dp)
-
-            // Нижняя часть: Кнопки с обводкой
-//            Row(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .height(IntrinsicSize.Min)
-//            ) {
-//                // Кнопка "Добавить фото"
-//                TextButton(
-//                    onClick = { },
-//                    modifier = Modifier
-//                        .weight(1f)
-//                        .height(48.dp),
-//                    shape = androidx.compose.ui.graphics.RectangleShape
-//                ) {
-//                    Text("Добавить фото", color = Color.White, fontSize = 16.sp)
-//                }
-//
-//                VerticalDivider(
-//                    color = Color.White,
-//                    thickness = 1.dp,
-//                    modifier = Modifier.fillMaxHeight().width(1.dp)
-//                )
-//
-//                // Кнопка "Детали"
-//                TextButton(
-//                    onClick = { },
-//                    modifier = Modifier
-//                        .weight(1f)
-//                        .height(48.dp),
-//                    shape = androidx.compose.ui.graphics.RectangleShape
-//                ) {
-//                    Text("Подробнее", color = Color.White, fontSize = 16.sp)
-//                }
-//            }
         }
     }
 }

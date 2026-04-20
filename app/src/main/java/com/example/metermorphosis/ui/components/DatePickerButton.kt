@@ -41,17 +41,19 @@ fun DatePickerButton(
 
     OutlinedButton(
         onClick = {
-            DatePickerDialog(
+            val dialog = DatePickerDialog(
                 context,
                 { _, y, m, d ->
-                    // Просто дата: 2026-04-20
                     val date = String.format("%04d-%02d-%02d", y, m + 1, d)
                     onDateSelected(date)
                 },
                 year,
                 month,
                 day
-            ).show()
+            )
+            // Запрещаем выбор будущих дат
+            dialog.datePicker.maxDate = System.currentTimeMillis()
+            dialog.show()
         },
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp)

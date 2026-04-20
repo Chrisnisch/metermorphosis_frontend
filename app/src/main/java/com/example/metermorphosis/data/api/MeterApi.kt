@@ -67,7 +67,8 @@ interface MeterApi {
     suspend fun updateReading(
         @Header("Authorization") token: String,
         @Path("id") id: Long,
-        @Query("value") value: Int
+        @Query("value") value: Int,
+        @Query("date") date: String?
     ): Response<ReadingResponse>
 
     // === RECOGNIZE ===

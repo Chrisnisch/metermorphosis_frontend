@@ -477,8 +477,8 @@ fun ReadingCard(
         EditReadingDialog(
             reading = reading,
             photoBitmap = bitmap,
-            onConfirm = { newValue ->
-                detailsViewModel.updateReading(token, reading.id, newValue, reading.meterId)
+            onConfirm = { newValue, newDate ->
+                detailsViewModel.updateReading(token, reading.id, newValue, newDate, reading.meterId)
                 showEditDialog = false
             },
             onDismiss = { showEditDialog = false }
@@ -490,10 +490,11 @@ fun ReadingCard(
 fun EditReadingDialog(
     reading: ReadingResponse,
     photoBitmap: Bitmap?,
-    onConfirm: (Int) -> Unit, // Только value
+    onConfirm: (Int, String) -> Unit, // Только value
     onDismiss: () -> Unit
 ) {
     var value by remember { mutableStateOf(reading.value.toString()) }
+    var date by remember { mutableStateOf(todayIso2()) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -538,11 +539,20 @@ fun EditReadingDialog(
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
+
+                Spacer(Modifier.height(12.dp))
+
+                Text("Дата:", fontWeight = FontWeight.Medium)
+                Spacer(Modifier.height(4.dp))
+                DatePickerButton(
+                    selectedDate = date,
+                    onDateSelected = { newDate -> date = newDate }
+                )
             }
         },
         confirmButton = {
             Button(
-                onClick = { value.toIntOrNull()?.let { onConfirm(it) } },
+                onClick = { value.toIntOrNull()?.let { onConfirm(it, date) } },
                 enabled = value.isNotBlank()
             ) { Text("Сохранить") }
         },
@@ -556,6 +566,16 @@ private fun todayIso(): String {
     val c = java.util.Calendar.getInstance()
     return String.format(
         "%04d-%02d-%02d",
+        c.get(java.util.Calendar.YEAR),
+        c.get(java.util.Calendar.MONTH) + 1,
+        c.get(java.util.Calendar.DAY_OF_MONTH)
+    )
+}
+
+private fun todayIso2(): String {
+    val c = java.util.Calendar.getInstance()
+    return String.format(
+        "%04d-%02d-%02dT00:00:00.000Z",
         c.get(java.util.Calendar.YEAR),
         c.get(java.util.Calendar.MONTH) + 1,
         c.get(java.util.Calendar.DAY_OF_MONTH)
