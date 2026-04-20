@@ -26,7 +26,7 @@ import com.example.metermorphosis.ui.theme.ColorSecondary
 fun AddPhotoDialog(
     onDismiss: () -> Unit,
     onPickFromGallery: () -> Unit,
-    onTakePhoto: () -> Unit,
+//    onTakePhoto: () -> Unit,
     isNew: Boolean = false
 ) {
     AlertDialog(
@@ -51,20 +51,20 @@ fun AddPhotoDialog(
                 ) {
                     Icon(Icons.Default.PhotoLibrary, contentDescription = null)
                     Spacer(Modifier.width(8.dp))
-                    Text("Выбрать из галереи")
+                    Text("Конечно!")
                 }
 
-                Spacer(Modifier.height(8.dp))
-
-                // Кнопка "Сделать фото"
-                OutlinedButton(
-                    onClick = onTakePhoto,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Icon(Icons.Default.CameraAlt, contentDescription = null)
-                    Spacer(Modifier.width(8.dp))
-                    Text("Сделать фото")
-                }
+//                Spacer(Modifier.height(8.dp))
+//
+//                // Кнопка "Сделать фото"
+//                OutlinedButton(
+//                    onClick = onTakePhoto,
+//                    modifier = Modifier.fillMaxWidth()
+//                ) {
+//                    Icon(Icons.Default.CameraAlt, contentDescription = null)
+//                    Spacer(Modifier.width(8.dp))
+//                    Text("Сделать фото")
+//                }
 
                 Spacer(Modifier.height(8.dp))
 

@@ -33,6 +33,7 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.metermorphosis.data.model.ReadingResponse
 import com.example.metermorphosis.ui.components.CustomBottomMenuItem
+import com.example.metermorphosis.ui.components.DatePickerButton
 import com.example.metermorphosis.ui.theme.*
 import com.example.metermorphosis.viewmodel.DetailsViewModel
 import java.io.File
@@ -246,12 +247,14 @@ fun MeterGalleryScreen(
             ConfirmReadingDialog(
                 recognizedValue = recognizedValue,
                 isLoading = isLoading,
-                photoUri = selectedPhotoUri!!, // Передаём фото
-                onConfirm = { value ->
+                photoUri = selectedPhotoUri!!,
+                onConfirm = { value, date ->
+                    android.util.Log.d("CREATE", "ДИАЛОГ: value=$value, date=$date")
                     detailsViewModel.createReading(
                         token = token,
                         meterId = meterId,
                         value = value,
+                        date = date,
                         context = context,
                         photoUri = selectedPhotoUri!!,
                         onSuccess = {
@@ -276,19 +279,26 @@ fun ConfirmReadingDialog(
     recognizedValue: Int?,
     isLoading: Boolean,
     photoUri: Uri,
-    onConfirm: (Int) -> Unit,
+    onConfirm: (Int, String) -> Unit,
     onDismiss: () -> Unit
 ) {
     var manualValue by remember { mutableStateOf(recognizedValue?.toString() ?: "") }
-    var date by remember {
-        mutableStateOf(
-            java.time.LocalDate.now().toString() // Сегодняшняя дата по умолчанию
-        )
-    }
+    var date by remember { mutableStateOf(todayIso()) }
     val context = LocalContext.current
 
     LaunchedEffect(recognizedValue) {
         recognizedValue?.let { manualValue = it.toString() }
+    }
+
+    val photoBitmap = remember(photoUri) {
+        try {
+            val inputStream = context.contentResolver.openInputStream(photoUri)
+            val bmp = BitmapFactory.decodeStream(inputStream)
+            inputStream?.close()
+            bmp
+        } catch (e: Exception) {
+            null
+        }
     }
 
     AlertDialog(
@@ -296,31 +306,6 @@ fun ConfirmReadingDialog(
         title = { Text("Подтвердите показание") },
         text = {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                // Превью фотографии
-                val bitmap = remember(photoUri) {
-                    try {
-                        val inputStream = photoUri.let { uri ->
-                            null // placeholder, реальная загрузка ниже
-                        }
-                        null
-                    } catch (e: Exception) {
-                        null
-                    }
-                }
-
-                // Загружаем Bitmap из Uri
-                val context = LocalContext.current
-                val photoBitmap = remember(photoUri) {
-                    try {
-                        val inputStream = context.contentResolver.openInputStream(photoUri)
-                        val bmp = BitmapFactory.decodeStream(inputStream)
-                        inputStream?.close()
-                        bmp
-                    } catch (e: Exception) {
-                        null
-                    }
-                }
-
                 if (photoBitmap != null) {
                     Image(
                         bitmap = photoBitmap.asImageBitmap(),
@@ -334,7 +319,6 @@ fun ConfirmReadingDialog(
                     Spacer(Modifier.height(12.dp))
                 }
 
-                // Статус распознавания
                 if (isLoading) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         CircularProgressIndicator(modifier = Modifier.size(20.dp))
@@ -346,9 +330,9 @@ fun ConfirmReadingDialog(
                 }
 
                 Spacer(Modifier.height(12.dp))
-                Text("Введите или скорректируйте:")
-                Spacer(Modifier.height(8.dp))
 
+                Text("Значение:", fontWeight = FontWeight.Medium)
+                Spacer(Modifier.height(4.dp))
                 TextField(
                     value = manualValue,
                     onValueChange = { manualValue = it.filter { ch -> ch.isDigit() } },
@@ -359,27 +343,17 @@ fun ConfirmReadingDialog(
 
                 Spacer(Modifier.height(12.dp))
 
-                // Поле даты
                 Text("Дата:", fontWeight = FontWeight.Medium)
                 Spacer(Modifier.height(4.dp))
-                TextField(
-                    value = date,
-                    onValueChange = { date = it },
-                    placeholder = { Text("ГГГГ-ММ-ДД") },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Text(
-                    text = "* Изменение даты пока не поддерживается сервером",
-                    fontSize = 11.sp,
-                    color = ColorSecondary,
-                    modifier = Modifier.padding(top = 4.dp)
+                DatePickerButton(
+                    selectedDate = date,
+                    onDateSelected = { newDate -> date = newDate }
                 )
             }
         },
         confirmButton = {
             Button(
-                onClick = { manualValue.toIntOrNull()?.let { onConfirm(it) } },
+                onClick = { manualValue.toIntOrNull()?.let { onConfirm(it, date) } },
                 enabled = manualValue.isNotBlank() && !isLoading
             ) { Text("Сохранить") }
         },
@@ -516,18 +490,16 @@ fun ReadingCard(
 fun EditReadingDialog(
     reading: ReadingResponse,
     photoBitmap: Bitmap?,
-    onConfirm: (Int) -> Unit,
+    onConfirm: (Int) -> Unit, // Только value
     onDismiss: () -> Unit
 ) {
     var value by remember { mutableStateOf(reading.value.toString()) }
-    var date by remember { mutableStateOf(reading.createdAt?.take(10) ?: "") }
 
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Редактировать показание") },
         text = {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                // Фото
                 if (photoBitmap != null) {
                     Image(
                         bitmap = photoBitmap.asImageBitmap(),
@@ -558,7 +530,6 @@ fun EditReadingDialog(
                     Spacer(Modifier.height(12.dp))
                 }
 
-                // Поле значения
                 Text("Значение:", fontWeight = FontWeight.Medium)
                 Spacer(Modifier.height(4.dp))
                 TextField(
@@ -566,25 +537,6 @@ fun EditReadingDialog(
                     onValueChange = { value = it.filter { ch -> ch.isDigit() } },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
-                )
-
-                Spacer(Modifier.height(12.dp))
-
-                // Поле даты (пока только фронт)
-                Text("Дата:", fontWeight = FontWeight.Medium)
-                Spacer(Modifier.height(4.dp))
-                TextField(
-                    value = date,
-                    onValueChange = { date = it },
-                    placeholder = { Text("ГГГГ-ММ-ДД") },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Text(
-                    text = "* Изменение даты пока не поддерживается сервером",
-                    fontSize = 11.sp,
-                    color = ColorSecondary,
-                    modifier = Modifier.padding(top = 4.dp)
                 )
             }
         },
@@ -597,5 +549,15 @@ fun EditReadingDialog(
         dismissButton = {
             TextButton(onClick = onDismiss) { Text("Отмена") }
         }
+    )
+}
+
+private fun todayIso(): String {
+    val c = java.util.Calendar.getInstance()
+    return String.format(
+        "%04d-%02d-%02d",
+        c.get(java.util.Calendar.YEAR),
+        c.get(java.util.Calendar.MONTH) + 1,
+        c.get(java.util.Calendar.DAY_OF_MONTH)
     )
 }

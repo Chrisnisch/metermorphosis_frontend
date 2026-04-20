@@ -117,6 +117,7 @@ class DetailsViewModel: ViewModel() {
                     }
                     _readings.value = response.body()
                         ?.sortedByDescending { it.createdAt } ?: emptyList()
+                    calculateMonthlyStats(list) // Считаем статистику
                 }
             } catch (e: Exception) {
                 _error.value = "Ошибка загрузки: ${e.message}"
@@ -147,23 +148,48 @@ class DetailsViewModel: ViewModel() {
     }
 
     // Создание показания с фото
-    fun createReading(token: String, meterId: Long, value: Int, context: Context, photoUri: Uri, onSuccess: () -> Unit) {
+    fun createReading(
+        token: String,
+        meterId: Long,
+        value: Int,
+        date: String?,
+        context: Context,
+        photoUri: Uri,
+        onSuccess: () -> Unit
+    ) {
         viewModelScope.launch {
             _isLoading.value = true
             try {
+                android.util.Log.d("CREATE", "=== СОЗДАНИЕ ===")
+                android.util.Log.d("CREATE", "meterId=$meterId, value=$value, date=$date")
+                android.util.Log.d("CREATE", "photoUri=$photoUri")
+
                 val filePart = uriToMultipart(context, photoUri)
+
+                android.util.Log.d("CREATE", "filePart создан: ${filePart.body.contentType()}")
+
                 val response = NetworkModule.api.createReading(
-                    "Bearer $token", meterId, value, filePart
+                    token = "Bearer $token",
+                    meterId = meterId,
+                    value = value,
+                    createdAt = date,
+                    file = filePart
                 )
+
+                android.util.Log.d("CREATE", "code=${response.code()}")
+                android.util.Log.d("CREATE", "body=${response.body()}")
+                android.util.Log.d("CREATE", "error=${response.errorBody()?.string()}")
+
                 if (response.isSuccessful) {
-                    loadReadings(token, meterId) // Обновляем список
-                    _recognizedValue.value = null // Сбрасываем распознанное значение
+                    android.util.Log.d("CREATE", "УСПЕХ!")
+                    loadReadings(token, meterId)
+                    _recognizedValue.value = null
                     onSuccess()
                 } else {
-                    val errorBody = response.errorBody()?.string()
-                    _error.value = "Ошибка: $errorBody"
+                    _error.value = "Ошибка: ${response.errorBody()?.string()}"
                 }
             } catch (e: Exception) {
+                android.util.Log.e("CREATE", "EXCEPTION: ${e.message}", e)
                 _error.value = "Ошибка сети: ${e.message}"
             } finally {
                 _isLoading.value = false
@@ -221,14 +247,15 @@ class DetailsViewModel: ViewModel() {
     fun updateReading(token: String, readingId: Long, newValue: Int, meterId: Long) {
         viewModelScope.launch {
             try {
-                val request = UpdateReadingRequest(value = newValue)
                 val response = NetworkModule.api.updateReading(
-                    "Bearer $token", readingId, request
+                    token = "Bearer $token",
+                    id = readingId,
+                    value = newValue
                 )
                 if (response.isSuccessful) {
                     loadReadings(token, meterId)
                 } else {
-                    _error.value = "Ошибка обновления: ${response.errorBody()?.string()}"
+                    _error.value = "Ошибка: ${response.errorBody()?.string()}"
                 }
             } catch (e: Exception) {
                 _error.value = "Ошибка сети: ${e.message}"
@@ -253,5 +280,68 @@ class DetailsViewModel: ViewModel() {
                 Log.e("API", "Error renaming: ${e.message}")
             }
         }
+    }
+}
+
+data class MonthlyPoint(
+    val label: String,    // "Янв", "Фев" и т.д.
+    val value: Float
+)
+
+private val _monthlyData = MutableStateFlow<List<MonthlyPoint>>(emptyList())
+val monthlyData = _monthlyData.asStateFlow()
+
+fun calculateMonthlyStats(readings: List<ReadingResponse>) {
+    try {
+        val now = java.util.Calendar.getInstance()
+        val sixMonthsAgo = java.util.Calendar.getInstance().apply {
+            add(java.util.Calendar.MONTH, -6)
+        }
+
+        val monthNames = listOf(
+            "Янв", "Фев", "Мар", "Апр", "Май", "Июн",
+            "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек"
+        )
+
+        // Группируем показания по месяцам
+        val grouped = readings
+            .filter { it.createdAt != null }
+            .mapNotNull { reading ->
+                try {
+                    val datePart = reading.createdAt!!.take(10) // "2026-04-20"
+                    val parts = datePart.split("-")
+                    val year = parts[0].toInt()
+                    val month = parts[1].toInt()
+                    Triple(year, month, reading.value)
+                } catch (e: Exception) {
+                    null
+                }
+            }
+            .filter { (year, month, _) ->
+                val cal = java.util.Calendar.getInstance().apply {
+                    set(java.util.Calendar.YEAR, year)
+                    set(java.util.Calendar.MONTH, month - 1)
+                }
+                cal.after(sixMonthsAgo)
+            }
+            .groupBy { (year, month, _) -> "$year-$month" }
+
+        // Берём максимальное значение за каждый месяц
+        val points = mutableListOf<MonthlyPoint>()
+        for (i in 5 downTo 0) {
+            val cal = java.util.Calendar.getInstance().apply {
+                add(java.util.Calendar.MONTH, -i)
+            }
+            val year = cal.get(java.util.Calendar.YEAR)
+            val month = cal.get(java.util.Calendar.MONTH) + 1
+            val key = "$year-$month"
+            val maxValue = grouped[key]?.maxOfOrNull { it.third }?.toFloat() ?: 0f
+            val label = monthNames[month - 1]
+            points.add(MonthlyPoint(label, maxValue))
+        }
+
+        _monthlyData.value = points
+    } catch (e: Exception) {
+        android.util.Log.e("STATS", "Ошибка расчёта: ${e.message}")
     }
 }

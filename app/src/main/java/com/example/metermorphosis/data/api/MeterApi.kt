@@ -15,6 +15,11 @@ interface MeterApi {
     @POST("auth/register")
     suspend fun register(@Body request: LoginRequest): Response<AuthResponse>
 
+    @POST("auth/refresh")
+    suspend fun refreshToken(
+        @Body request: RefreshRequest
+    ): Response<RefreshResponse>
+
     // === METERS ===
     @GET("meters")
     suspend fun getMeters(
@@ -48,8 +53,9 @@ interface MeterApi {
         @Header("Authorization") token: String,
         @Query("meterId") meterId: Long,
         @Query("value") value: Int,
+        @Query("createdAt") createdAt: String? = null,
         @Part file: MultipartBody.Part
-    ): Response<Reading>
+    ): Response<ReadingResponse>
 
     @DELETE("readings/{id}")
     suspend fun deleteReading(
@@ -61,8 +67,8 @@ interface MeterApi {
     suspend fun updateReading(
         @Header("Authorization") token: String,
         @Path("id") id: Long,
-        @Body request: UpdateReadingRequest
-    ): Response<Reading>
+        @Query("value") value: Int
+    ): Response<ReadingResponse>
 
     // === RECOGNIZE ===
     @Multipart

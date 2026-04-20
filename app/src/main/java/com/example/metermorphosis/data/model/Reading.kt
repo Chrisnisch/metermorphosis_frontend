@@ -16,5 +16,6 @@ data class Reading(
 )
 
 data class UpdateReadingRequest(
-    val value: Int
+    val value: Int,
+    val createdAt: String? = null
 )
