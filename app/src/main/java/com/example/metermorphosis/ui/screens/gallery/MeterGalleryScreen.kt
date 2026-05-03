@@ -62,7 +62,7 @@ fun MeterGalleryScreen(
     ) { uri: Uri? ->
         uri?.let {
             selectedPhotoUri = it
-            detailsViewModel.recognizeFromPhoto(token, context, it)
+            detailsViewModel.recognizePhoto(context, it)
             showConfirmDialog = true
         }
     }
@@ -72,7 +72,7 @@ fun MeterGalleryScreen(
     ) { success ->
         if (success && cameraUri != null) {
             selectedPhotoUri = cameraUri
-            detailsViewModel.recognizeFromPhoto(token, context, cameraUri!!)
+            detailsViewModel.recognizePhoto( context, cameraUri!!)
             showConfirmDialog = true
         }
     }

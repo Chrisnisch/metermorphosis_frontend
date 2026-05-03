@@ -283,6 +283,36 @@ class DetailsViewModel: ViewModel() {
             }
         }
     }
+
+    fun recognizePhoto(context: Context, photoUri: Uri) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            _recognizedValue.value = null
+            try {
+                val filePart = uriToMultipart(context, photoUri)
+
+                android.util.Log.d("ML", "Отправляем фото на распознавание...")
+
+                val response = NetworkModule.mlApi.recognize(file = filePart)
+
+                android.util.Log.d("ML", "code=${response.code()}")
+                android.util.Log.d("ML", "body=${response.body()}")
+
+                if (response.isSuccessful) {
+                    _recognizedValue.value = response.body()?.value
+                    android.util.Log.d("ML", "Распознано: ${response.body()?.value}")
+                } else {
+                    android.util.Log.e("ML", "Ошибка: ${response.errorBody()?.string()}")
+                    _recognizedValue.value = null
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("ML", "EXCEPTION: ${e.message}", e)
+                _recognizedValue.value = null
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
 }
 
 data class MonthlyPoint(
@@ -347,3 +377,4 @@ fun calculateMonthlyStats(readings: List<ReadingResponse>) {
         android.util.Log.e("STATS", "Ошибка расчёта: ${e.message}")
     }
 }
+
